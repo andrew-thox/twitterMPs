@@ -14,8 +14,20 @@
   color: white;
 }
 
-.App-intro {
-  font-size: large;
+.stream-item {
+  text-align: left;
+}
+.full-name {
+  padding-right: .5em;
+}
+
+.quoted-tweet-container {
+  padding: 0.5em 0;
+}
+
+.quoted-tweet {
+  border: 1px solid;
+  padding: 0.5em;
 }
 
 @keyframes App-logo-spin {
