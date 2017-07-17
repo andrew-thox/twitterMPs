@@ -2,7 +2,15 @@ import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import SocketIOClient from 'socket.io-client';
-import Linkify from 'react-linkify'
+import * as linkify from 'linkifyjs';;
+import linkifyHtml from 'linkifyjs/html';
+
+import hashtag from 'linkifyjs/plugins/hashtag';
+import mention from 'linkifyjs/plugins/mention';
+hashtag(linkify);
+mention(linkify);
+
+
 
 let socket = SocketIOClient('http://localhost:5000', {path: '/socket.io/', origins: '*'});
 
@@ -14,7 +22,7 @@ class App extends Component {
             fruits: [
                 {
                     id: 'fruit-1',
-                    msg: 'apple',
+                    msg: 'apples are #great @andrewkenyon',
                     user: "jessphillips",
                     profile_image: "https://pbs.twimg.com/profile_images/597069124720828417/IvNyrUQc_bigger.jpg",
                     name: "Jess Philips",
@@ -79,7 +87,21 @@ let FruitList = React.createClass({
     render: function () {
         let stationComponents = this.props.fruits.map(function (tweet) {
             const has_quoted_status = Object.keys(tweet.quoted_status) != 0;
+            const msg = {
+                __html: linkifyHtml(tweet.msg, {
+                    formatHref: function (href, type) {
+                        if (type === 'hashtag') {
+                            href = 'https://twitter.com/hashtag/' + href.substring(1);
+                        }
+                        if (type === 'mention') {
+                            href = 'https://twitter.com/hashtag/' + href.substring(1);
+                        }
+                        return href;
+                    }
+                })
+            };
             console.log(tweet);
+
             return (
                 <div className="list-group-item list-group-item-info col-md-12" key={tweet.id}>
                     <div className="col-md-1">
@@ -93,7 +115,7 @@ let FruitList = React.createClass({
                             <span className="user-name">@{tweet.user}</span>
                         </div>
                         <div className="stream-item body">
-                            <Linkify>{tweet.msg}</Linkify>
+                            <div dangerouslySetInnerHTML={msg}/>
                             {has_quoted_status ? (
                                 <div className="quoted-tweet-container">
                                     <div className="quoted-tweet">
@@ -103,7 +125,7 @@ let FruitList = React.createClass({
                                             <span className="user-name">@{tweet.quoted_status.user}</span>
                                         </div>
                                         <div className="stream-item body">
-                                            <Linkify>{tweet.quoted_status.msg}</Linkify>
+                                            {/*<Linkify>{tweet.quoted_status.msg}</Linkify>*/}
                                         </div>
                                     </div>
                                 </div>
